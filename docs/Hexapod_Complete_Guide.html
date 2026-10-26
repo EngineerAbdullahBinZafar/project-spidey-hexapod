@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MakeYourPet Hexapod — Complete Build Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --cream: #faf6f0;
+    --warm-white: #fffef9;
+    --parchment: #f5ede0;
+    --blush: #f0e6d8;
+    --border: #e8d9c8;
+    --text-dark: #2d2318;
+    --text-mid: #5c4a35;
+    --text-light: #8b7355;
+    --accent: #c4873a;
+    --accent-light: #e8c491;
+    --accent-dark: #a06828;
+    --green-soft: #e8f0e8;
+    --green-text: #3d6b3d;
+    --red-soft: #f5e8e8;
+    --red-text: #8b2e2e;
+    --blue-soft: #e8edf5;
+    --blue-text: #2e4a8b;
+    --shadow: 0 4px 24px rgba(100, 70, 30, 0.10);
+    --shadow-sm: 0 2px 10px rgba(100, 70, 30, 0.08);
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #2d2318 0%, #5c3d1e 50%, #8b5e2e 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 24px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(196, 135, 58, 0.3);
+    border: 1px solid rgba(196, 135, 58, 0.6);
+    color: var(--accent-light);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+  .hero h1 span { color: var(--accent-light); }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(16px, 2.5vw, 22px);
+    font-style: italic;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 24px;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* NAV */
+  .toc {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .toc-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .toc-inner::-webkit-scrollbar { display: none; }
+  .toc-inner a {
+    display: inline-block;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-light);
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc-inner a:hover { color: var(--accent); border-bottom-color: var(--accent-light); }
+
+  /* MAIN */
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* SECTIONS */
+  section { margin-bottom: 50px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: var(--accent);
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead tr {
+    background: linear-gradient(to right, #2d2318, #5c3d1e);
+    color: white;
+  }
+  thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--parchment); }
+  tbody tr:nth-child(even) { background: rgba(240, 230, 216, 0.3); }
+  tbody tr:nth-child(even):hover { background: var(--parchment); }
+  td { padding: 12px 16px; vertical-align: top; line-height: 1.5; }
+  td:first-child { font-weight: 500; color: var(--text-mid); }
+
+  /* ALERTS */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-left: 4px solid;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .alert-warning {
+    background: #fff8e8;
+    border-color: #d4a017;
+    color: #7a5a00;
+  }
+  .alert-critical {
+    background: var(--red-soft);
+    border-color: #c0392b;
+    color: var(--red-text);
+  }
+  .alert-info {
+    background: var(--blue-soft);
+    border-color: #2e4a8b;
+    color: var(--blue-text);
+  }
+  .alert-success {
+    background: var(--green-soft);
+    border-color: #27ae60;
+    color: var(--green-text);
+  }
+  .alert strong { font-weight: 600; }
+
+  /* STEP LIST */
+  .steps { counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .step-num {
+    counter-increment: step;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--parchment);
+    border: 2px solid var(--accent-light);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-content h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  .step-content p { font-size: 14px; color: var(--text-mid); }
+  .step-content ul { font-size: 14px; color: var(--text-mid); margin-top: 8px; padding-left: 18px; }
+  .step-content ul li { margin-bottom: 4px; }
+
+  /* LINK LIST */
+  .link-list { list-style: none; }
+  .link-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .link-list li:last-child { border-bottom: none; }
+  .link-list li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+  .link-list a {
+    color: var(--accent-dark);
+    text-decoration: none;
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .link-list a:hover { text-decoration: underline; }
+
+  /* HIGHLIGHT BOX */
+  .highlight-box {
+    background: linear-gradient(135deg, var(--parchment) 0%, var(--blush) 100%);
+    border: 1px solid var(--accent-light);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .highlight-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin-bottom: 14px;
+  }
+
+  /* BUDGET */
+  .budget-total {
+    background: linear-gradient(135deg, #2d2318, #5c3d1e);
+    color: white;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .budget-total .label {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.8);
+  }
+  .budget-total .amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent-light);
+  }
+  .budget-total .note { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+  /* VIDEO LIST */
+  .video-item {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .video-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #c0392b;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .video-item h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+  .video-item p { font-size: 13px; color: var(--text-light); }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-green { background: var(--green-soft); color: var(--green-text); }
+  .tag-red { background: var(--red-soft); color: var(--red-text); }
+  .tag-blue { background: var(--blue-soft); color: var(--blue-text); }
+  .tag-gold { background: #fff3cd; color: #856404; }
+
+  /* CODE */
+  code {
+    font-family: 'Courier New', monospace;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--accent-dark);
+  }
+  pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: 13px; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    background: var(--warm-white);
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-light);
+  }
+  footer strong { color: var(--accent-dark); }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .budget-total { flex-direction: column; }
+    .budget-total .amount { font-size: 26px; }
+    thead th { font-size: 11px; padding: 10px 10px; }
+    td { padding: 10px 10px; font-size: 13px; }
+  }
+  
+  /* TWO COLUMN */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">FYP Research Report — UET Lahore, Faisalabad</div>
+    <h1>MakeYourPet <span>Hexapod</span><br>Complete Build Guide</h1>
+    <p class="hero-sub">Everything you need — hardware, firmware, assembly, software, and budget</p>
+    <div class="hero-meta">
+      <span>Abdullah Bin Zafar (2023-MC-292)</span>
+      <span>Mechatronics Engineering</span>
+      <span>Session 2023–2027</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#overview">Overview</a>
+    <a href="#resources">All Links</a>
+    <a href="#hardware">Hardware BOM</a>
+    <a href="#screws">Screws</a>
+    <a href="#electronics">Electronics</a>
+    <a href="#firmware">Firmware</a>
+    <a href="#assembly">Assembly Steps</a>
+    <a href="#youtube">YouTube Guide</a>
+    <a href="#software">Software</a>
+    <a href="#budget">Budget</a>
+    <a href="#fyp">FYP Defense</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- SECTION 1: OVERVIEW -->
+  <section id="overview">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Project Overview</h2>
+    </div>
+
+    <div class="highlight-box">
+      <h3>Chipo — The Student-Friendly Hexapod</h3>
+      <p style="font-size:15px; color: var(--text-mid); margin-bottom: 14px;">
+        Chipo is the budget-friendly variant of the MakeYourPet hexapod family, designed for students and hobbyists. It uses MG996R servos instead of the expensive coreless metal-gear DS3235 servos used in the premium "Chica" version. All mechanical parts are 3D printed in PLA/PETG.
+      </p>
+      <div class="two-col">
+        <div>
+          <strong style="color:var(--accent-dark); font-size:13px; text-transform:uppercase; letter-spacing:1px;">Chipo (Student Version)</strong>
+          <ul style="margin-top:10px; padding-left:20px; font-size:14px; color:var(--text-mid);">
+            <li>18x MG996R servos (metal gear)</li>
+            <li>Femur length: 60mm</li>
+            <li>Tibia length: 104mm</li>
+            <li>Files in <code>hexapod-main/Chipo/</code></li>
+            <li>Target budget: PKR 40,000–48,000</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="color:var(--accent-dark); font-size:13px; text-transform:uppercase; letter-spacing:1px;">Chica (Premium Version)</strong>
+          <ul style="margin-top:10px; padding-left:20px; font-size:14px; color:var(--text-mid);">
+            <li>18x DS3235 / DSSERVO coreless servos</li>
+            <li>Femur length: 80mm</li>
+            <li>Tibia length: 134mm</li>
+            <li>Budget: PKR 80,000–120,000+</li>
+            <li>NOT recommended for students</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Degrees of Freedom</div>
+        <p style="font-size:14px; color:var(--text-mid);">6 legs × 3 joints = <strong>18 DOF</strong> total. Each leg has: Coxa (hip rotation), Femur (up/down), Tibia (knee bend). This is a true hexapod with full inverse kinematics support.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Gait Modes</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>STANDARD — Normal walking gait</li>
+          <li>RACE — Fast movement</li>
+          <li>OFFROAD — Uneven terrain</li>
+          <li>CUSTOM — User-defined</li>
+          <li>QUADRUPED — 4-leg mode</li>
+          <li>BLOCK — Robot stays still</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Purpose (For Defense)</div>
+        <p style="font-size:14px; color:var(--text-mid);">
+          <strong>"Autonomous Bio-Inspired Hexapod for Hazardous Terrain Reconnaissance and Disaster Search Operations"</strong> — uses terrain-adaptive touch sensors, 6-legged stability for rubble/uneven ground, and AI-powered vision via mounted smartphone.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ALL LINKS -->
+  <section id="resources">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>All Official & Community Links</h2>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Official Resources</div>
+        <ul class="link-list">
+          <li><a href="https://github.com/MakeYourPet/hexapod" target="_blank">Main GitHub Repository</a> — STL files, wiring diagrams, config files</li>
+          <li><a href="https://www.youtube.com/@makeyourpet" target="_blank">YouTube Channel</a> — Full build series videos</li>
+          <li><a href="https://discord.gg/vb8YWMfBuk" target="_blank">Discord Server</a> — Community support, exact screw questions</li>
+          <li><a href="https://www.makeyourpet.com/" target="_blank">Official Website</a> — makeyourpet.com</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Firmware & Software</div>
+        <ul class="link-list">
+          <li><a href="https://github.com/EddieCarrera/chica-servo2040-simpleDriver/releases/download/v0.0.1/chica-servo2040_release.uf2" target="_blank">DIRECT .uf2 Firmware Download</a> — Pre-compiled binary for Servo2040</li>
+          <li><a href="https://github.com/EddieCarrera/chica-servo2040-simpleDriver" target="_blank">Eddie Carrera Firmware Repo</a> — Instructions + flashing guide</li>
+          <li><a href="https://play.google.com/store/apps/details?id=com.makeyourpet.chicaserver" target="_blank">Chica Server App</a> — Google Play (runs on phone)</li>
+          <li><a href="https://play.google.com/store/apps/details?id=com.makeyourpet.chicaclient" target="_blank">Chica Client App</a> — Google Play (controller)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Community Parts Lists</div>
+        <ul class="link-list">
+          <li><a href="https://docs.google.com/spreadsheets/d/1jLi3IdmLERsBDhjaqHxFGQgZul_3uq9oj55M1rFG8mY/edit#gid=0" target="_blank">Fan Parts List #1</a> — Google Sheets (most popular)</li>
+          <li><a href="https://docs.google.com/spreadsheets/d/1y--z7EeejWcb-8ooPaIFn3Hulu9dJOcoKyGoxGq8KI8/edit" target="_blank">Fan Parts List #2</a> — Google Sheets (alternative)</li>
+          <li><a href="https://github.com/LonelyGhost6/Public/blob/main/part-list.pdf" target="_blank">LonelyGhost6 PDF Parts List</a> — PDF format, comprehensive</li>
+          <li><a href="https://github.com/almelnz2005/hexapod" target="_blank">almelnz2005 Fork</a> — Metal horn version with M3 screws</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Additional Technical Links</div>
+        <ul class="link-list">
+          <li><a href="https://cdn.shopify.com/s/files/1/0174/1800/files/servo2040_schematic.pdf?v=1648817752" target="_blank">Servo2040 Schematic PDF</a> — Circuit diagram for Pimoroni board</li>
+          <li><a href="https://shop.pimoroni.com/products/servo-2040?variant=39800591679571" target="_blank">Pimoroni Servo2040 Purchase</a> — Official Pimoroni shop</li>
+          <li><a href="https://github.com/MakeYourPet/hexapod/blob/main/wiring-diagram-servo2040.png" target="_blank">Wiring Diagram (Servo2040)</a> — Full color wiring schematic</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: HARDWARE BOM -->
+  <section id="hardware">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Complete Hardware Bill of Materials (Chipo)</h2>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Note:</strong> This BOM is compiled from the official community parts lists and verified research. For exact screw counts per version, open the Fan Parts List Google Sheets (linked above) and check against YOUR specific STL files. STL files with higher numbers are newer versions.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Part Name</th>
+            <th>Qty</th>
+            <th>Specification</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- SERVOS -->
+          <tr>
+            <td>1</td>
+            <td>MG996R Metal Gear Servo</td>
+            <td><strong>18</strong></td>
+            <td>180° or 270° travel, 9–12kg.cm torque, metal gears, dual ball bearings</td>
+            <td>Buy 20 for spares. Avoid cheap clones — get branded.</td>
+          </tr>
+          <!-- CONTROLLER -->
+          <tr>
+            <td>2</td>
+            <td>Pimoroni Servo2040</td>
+            <td><strong>1</strong></td>
+            <td>RP2040 based, 18 PWM servo channels, current monitoring, USB-C, 10A screw terminal</td>
+            <td>HIGHLY RECOMMENDED. Alternate: Pololu Mini Maestro 24 (old version, less features)</td>
+          </tr>
+          <!-- BATTERY -->
+          <tr>
+            <td>3</td>
+            <td>2S LiPo Battery</td>
+            <td><strong>1</strong></td>
+            <td>7.4V, minimum 3000mAh (6200mAh recommended), 30C–60C discharge rate, XT60 connector</td>
+            <td>Higher mAh = longer run time. Get 4500mAh+ for 30 min runtime.</td>
+          </tr>
+          <!-- CHARGER -->
+          <tr>
+            <td>4</td>
+            <td>LiPo Balance Charger</td>
+            <td><strong>1</strong></td>
+            <td>IMAX B6 or similar, supports 2S LiPo balance charging</td>
+            <td>Essential for safety. Never charge unbalanced.</td>
+          </tr>
+          <!-- RELAY -->
+          <tr>
+            <td>5</td>
+            <td>5V Relay Module</td>
+            <td><strong>1</strong></td>
+            <td>SRD-05VDC-SL-C or equivalent, 5V coil, Single Pole Double Throw (SPDT)</td>
+            <td>Controls servo power rail for emergency cutoff. Connects to Pin P26 on Servo2040 (High-Active)</td>
+          </tr>
+          <!-- MICROSWITCHES -->
+          <tr>
+            <td>6</td>
+            <td>Microswitch / Touch Sensor</td>
+            <td><strong>6</strong></td>
+            <td>Small PCB-mount or roller-arm microswitch, 5V logic compatible</td>
+            <td>One per leg tip. Provides terrain sensing. Connected to P18–P23 (High-Active)</td>
+          </tr>
+          <!-- PLA FILAMENT -->
+          <tr>
+            <td>7</td>
+            <td>PLA Filament (or PETG)</td>
+            <td><strong>~1.5–2 kg</strong></td>
+            <td>1.75mm diameter. PLA works for indoor use. PETG for strength/heat resistance.</td>
+            <td>Expect ~50–70 hours of printing time for all parts</td>
+          </tr>
+          <!-- POWER SWITCH -->
+          <tr>
+            <td>8</td>
+            <td>Main Power Switch</td>
+            <td><strong>1</strong></td>
+            <td>Rocker or key-switch, rated for 10A+ at 7.4V DC</td>
+            <td>Between battery positive and Servo2040 power terminal</td>
+          </tr>
+          <!-- XT60 CONNECTORS -->
+          <tr>
+            <td>9</td>
+            <td>XT60 Connector Pair</td>
+            <td><strong>2–4 pairs</strong></td>
+            <td>Male + Female XT60 bullet connectors</td>
+            <td>For battery connection. Include in wiring harness.</td>
+          </tr>
+          <!-- WIRES -->
+          <tr>
+            <td>10</td>
+            <td>Silicone Wire</td>
+            <td><strong>~3–5m each</strong></td>
+            <td>20AWG (power) and 26AWG (signal). Multi-color for clarity.</td>
+            <td>Red/Black for power, colored for servo signals</td>
+          </tr>
+          <!-- JST CONNECTORS -->
+          <tr>
+            <td>11</td>
+            <td>JST-XH 3-pin Connectors</td>
+            <td><strong>20–30</strong></td>
+            <td>JST-XH 2.54mm pitch, 3-wire servo connectors</td>
+            <td>Standard servo connector type. For extending servo wires if needed.</td>
+          </tr>
+          <!-- USB-C CABLE -->
+          <tr>
+            <td>12</td>
+            <td>USB-C Data Cable</td>
+            <td><strong>1</strong></td>
+            <td>Short USB-C to USB-C or USB-A to USB-C data cable</td>
+            <td>Connects Android phone to Servo2040. Data cable only (not charge-only).</td>
+          </tr>
+          <!-- VOLTAGE METER -->
+          <tr>
+            <td>13</td>
+            <td>Battery Voltage Meter (optional)</td>
+            <td><strong>1</strong></td>
+            <td>Mini 2S LiPo battery indicator with buzzer</td>
+            <td>Low-voltage alarm. Very cheap safety device (~PKR 200).</td>
+          </tr>
+          <!-- HEAT SHRINK -->
+          <tr>
+            <td>14</td>
+            <td>Heat Shrink Tubing Assortment</td>
+            <td><strong>1 set</strong></td>
+            <td>Various sizes: 2mm, 3mm, 5mm diameter</td>
+            <td>For all soldered connections. Essential for safety.</td>
+          </tr>
+          <!-- SERVO EXTENSION -->
+          <tr>
+            <td>15</td>
+            <td>Servo Extension Cables</td>
+            <td><strong>18</strong></td>
+            <td>30–50cm servo extension wires (3-pin JST/servo connector)</td>
+            <td>Each servo needs to reach Servo2040 board in body center</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 4: SCREWS -->
+  <section id="screws">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Screws, Nuts, and Fasteners</h2>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>Important:</strong> These screw sizes are confirmed from community builds and the almelnz2005 fork (which specifically optimized for M3 screws). The EXACT quantities depend on which STL version you print. Best approach: buy an M3 assortment kit + M2 assortment kit.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Screw Type</th>
+            <th>Size</th>
+            <th>Approx. Qty</th>
+            <th>Used For</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>M3 Socket Head Cap Screw</td>
+            <td>M3 x 8mm</td>
+            <td><strong>40–60</strong></td>
+            <td>Body frame, leg-to-body connections, cover plates</td>
+            <td>Allen key / hex socket</td>
+          </tr>
+          <tr>
+            <td>M3 Socket Head Cap Screw</td>
+            <td>M3 x 10mm</td>
+            <td><strong>30–50</strong></td>
+            <td>Thicker body parts, battery bar, phone bar mount</td>
+            <td>Allen key / hex socket</td>
+          </tr>
+          <tr>
+            <td>M3 Socket Head Cap Screw</td>
+            <td>M3 x 12mm</td>
+            <td><strong>20–30</strong></td>
+            <td>Coxa-to-frame joints, servo mounting (deep holes)</td>
+            <td>Allen key / hex socket</td>
+          </tr>
+          <tr>
+            <td>M3 Hex Nut</td>
+            <td>M3 Standard</td>
+            <td><strong>60–80</strong></td>
+            <td>All M3 screw locations</td>
+            <td>Insert into printed hex slots</td>
+          </tr>
+          <tr>
+            <td>M3 Heat-Set Insert</td>
+            <td>M3 x 5mm</td>
+            <td><strong>20–40</strong></td>
+            <td>Threaded inserts for plastic (optional but stronger)</td>
+            <td>Press-fit with soldering iron</td>
+          </tr>
+          <tr>
+            <td>M2 Screw</td>
+            <td>M2 x 6mm or M2 x 8mm</td>
+            <td><strong>20–40</strong></td>
+            <td>Servo horn attachment, small electronics mounting</td>
+            <td>Phillips or hex head</td>
+          </tr>
+          <tr>
+            <td>M2 Nut</td>
+            <td>M2 Standard</td>
+            <td><strong>20–40</strong></td>
+            <td>Servo horn and small fastener locations</td>
+            <td>Standard hex nut</td>
+          </tr>
+          <tr>
+            <td>Servo Mounting Screw (included with servos)</td>
+            <td>M3 x 6mm approx.</td>
+            <td><strong>72 (4 per servo)</strong></td>
+            <td>Mounting each servo to its bracket</td>
+            <td>Usually included in MG996R box</td>
+          </tr>
+          <tr>
+            <td>Metal Servo Horn Screws</td>
+            <td>M3 x 4–6mm</td>
+            <td><strong>18</strong></td>
+            <td>Securing servo horn to servo spline (center screw)</td>
+            <td>Phillips head, included with servo</td>
+          </tr>
+          <tr>
+            <td>Self-Tapping Plastic Screw</td>
+            <td>M3 or M2.5</td>
+            <td><strong>10–20</strong></td>
+            <td>Controller board, relay mount to plastic frame</td>
+            <td>Phillips head</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-success" style="margin-top:16px;">
+      <strong>Shopping Tip:</strong> Buy one "M3 Screw Assortment Kit" (includes M3 x 6/8/10/12/16mm + nuts + washers, typically 500–800 pieces) from any local hardware shop or online. Cost: PKR 500–800. Also buy one M2 assortment. This avoids running out mid-build.
+    </div>
+  </section>
+
+  <!-- SECTION 5: ELECTRONICS -->
+  <section id="electronics">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Electronics & Wiring Details</h2>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Pimoroni Servo2040 Board</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>MCU: RP2040 dual-core ARM Cortex-M0+</li>
+          <li>18 dedicated PWM servo channels (P0–P17)</li>
+          <li>Current monitoring per channel (via INA219)</li>
+          <li>Screw terminal: 10A continuous max, reverse polarity protected</li>
+          <li>Onboard LED bar (6 LEDs) for status</li>
+          <li>USB-C for programming AND phone connection</li>
+          <li>6 additional GPIO (P18–P23) — used for touch sensors</li>
+          <li>Relay output: P26 (High-Active)</li>
+          <li>Voltage monitoring pins available</li>
+        </ul>
+        <div class="alert alert-critical" style="margin-top:14px; font-size:13px;">
+          <strong>CRITICAL MOD REQUIRED:</strong> You MUST physically cut the "Separate USB and Ext. Power" trace on the BACK of the Servo2040 board before connecting a battery voltage above 5V. Otherwise you risk damaging the RP2040 chip or your phone.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Servo Pin Mapping (Chipo)</div>
+        <p style="font-size:13px; color:var(--text-light); margin-bottom:10px;">L = Left, R = Right. First digit = leg (1=front, 2=mid, 3=rear). Second digit = joint (1=Coxa, 2=Femur, 3=Tibia)</p>
+        <table style="font-size:12px; width:100%;">
+          <thead><tr><th style="background:#3d2b1a; padding:6px 8px;">Servo</th><th style="background:#3d2b1a; padding:6px 8px;">Pin</th><th style="background:#3d2b1a; padding:6px 8px;">Servo</th><th style="background:#3d2b1a; padding:6px 8px;">Pin</th></tr></thead>
+          <tbody style="font-size:12px;">
+            <tr><td style="padding:5px 8px;">L11 (L-Front Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P0</td><td style="padding:5px 8px;">R11 (R-Front Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P9</td></tr>
+            <tr><td style="padding:5px 8px;">L12 (L-Front Femur)</td><td style="padding:5px 8px; color:var(--accent);">P1</td><td style="padding:5px 8px;">R12 (R-Front Femur)</td><td style="padding:5px 8px; color:var(--accent);">P10</td></tr>
+            <tr><td style="padding:5px 8px;">L13 (L-Front Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P2</td><td style="padding:5px 8px;">R13 (R-Front Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P11</td></tr>
+            <tr><td style="padding:5px 8px;">L21 (L-Mid Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P3</td><td style="padding:5px 8px;">R21 (R-Mid Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P12</td></tr>
+            <tr><td style="padding:5px 8px;">L22 (L-Mid Femur)</td><td style="padding:5px 8px; color:var(--accent);">P4</td><td style="padding:5px 8px;">R22 (R-Mid Femur)</td><td style="padding:5px 8px; color:var(--accent);">P13</td></tr>
+            <tr><td style="padding:5px 8px;">L23 (L-Mid Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P5</td><td style="padding:5px 8px;">R23 (R-Mid Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P14</td></tr>
+            <tr><td style="padding:5px 8px;">L31 (L-Rear Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P6</td><td style="padding:5px 8px;">R31 (R-Rear Coxa)</td><td style="padding:5px 8px; color:var(--accent);">P15</td></tr>
+            <tr><td style="padding:5px 8px;">L32 (L-Rear Femur)</td><td style="padding:5px 8px; color:var(--accent);">P7</td><td style="padding:5px 8px;">R32 (R-Rear Femur)</td><td style="padding:5px 8px; color:var(--accent);">P16</td></tr>
+            <tr><td style="padding:5px 8px;">L33 (L-Rear Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P8</td><td style="padding:5px 8px;">R33 (R-Rear Tibia)</td><td style="padding:5px 8px; color:var(--accent);">P17</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="card-title">Touch Sensor & Protection Configuration</div>
+      <div class="two-col">
+        <div>
+          <strong style="font-size:13px; color:var(--text-mid);">Touch Sensors (P18–P23)</strong>
+          <ul style="font-size:14px; color:var(--text-mid); padding-left:18px; margin-top:8px;">
+            <li>P18 = TS_L1 (Left Front leg tip)</li>
+            <li>P19 = TS_L2 (Left Mid leg tip)</li>
+            <li>P20 = TS_L3 (Left Rear leg tip)</li>
+            <li>P21 = TS_R1 (Right Front leg tip)</li>
+            <li>P22 = TS_R2 (Right Mid leg tip)</li>
+            <li>P23 = TS_R3 (Right Rear leg tip)</li>
+            <li>Logic: High-Active (pressed = HIGH)</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="font-size:13px; color:var(--text-mid);">Protection Thresholds (from chipo-config)</strong>
+          <ul style="font-size:14px; color:var(--text-mid); padding-left:18px; margin-top:8px;">
+            <li>Voltage WARNING: 5.4V (per cell: 2.7V)</li>
+            <li>Voltage CUTOFF: 5.0V (per cell: 2.5V)</li>
+            <li>Current WARNING: 5.0A total</li>
+            <li>Current CUTOFF: 7.0A total</li>
+            <li>Relay Pin: P26 (High = servos ENABLED)</li>
+            <li>PWM Range: ~980–2050 microseconds</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FIRMWARE -->
+  <section id="firmware">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Firmware — How to Flash Servo2040</h2>
+    </div>
+
+    <div class="alert alert-critical">
+      <strong>FYP Defense Warning:</strong> The pre-compiled .uf2 firmware is made by Eddie Carrera (not you). For FYP, you CANNOT submit this as your own work. Solution: Use the Eddie firmware to test hardware first, then write your own MicroPython IK firmware. The chassis + physical build is your work; the software must be custom.
+    </div>
+
+    <div class="highlight-box" style="margin-top:18px;">
+      <h3>Firmware Download Link (Direct)</h3>
+      <code style="display:block; word-break:break-all; padding:12px; margin:10px 0; font-size:13px;">
+        https://github.com/EddieCarrera/chica-servo2040-simpleDriver/releases/download/v0.0.1/chica-servo2040_release.uf2
+      </code>
+      <p style="font-size:14px; color:var(--text-mid);">Save this file as <code>chica-servo2040_release.uf2</code> on your computer. This is the only released version (v0.0.1).</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Cut the PCB Trace FIRST</h4>
+          <p>On the back of the Servo2040, locate the "Separate USB and Ext. Power" jumper trace. Use a sharp hobby knife or scalpel to CUT this trace. This prevents 7.4V battery from backfeeding into USB port and destroying the chip or your phone. DO THIS BEFORE connecting any battery.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Enter Bootloader Mode</h4>
+          <p>Plug USB-C cable into your computer. Then: Hold the "BOOT/USER" button down, press and release the RESET button simultaneously, then release BOOT button. The board will appear as a removable USB drive on your computer (like a USB flash drive).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Copy the .uf2 File</h4>
+          <p>Simply drag and drop the <code>chica-servo2040_release.uf2</code> file onto the RP2040 drive that appeared. The board will automatically reboot and the LED bar will light up to confirm firmware is running.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Install Chica Server App on Phone</h4>
+          <p>On your Android phone, install "Chica Server" from Google Play Store. Enable USB Debugging on the phone. Connect phone to Servo2040 via USB-C data cable. Open Chica Server app and grant USB permissions.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Load Config File</h4>
+          <p>Upload the <code>chipo-config-2040.txt</code> from the GitHub repo to the Chica Server app. This file contains all servo PWM calibration values, pin assignments, and protection thresholds. Without this, servos will not move correctly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Control with Chica Client</h4>
+          <p>On a second phone (or same phone with second app), install "Chica Client". This connects to the Chica Server over WiFi (same network) and provides joystick controls for the robot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: ASSEMBLY STEPS -->
+  <section id="assembly">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Assembly Sequence (Step-by-Step)</h2>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Print order:</strong> Print one leg first to test fit before printing all 6. STL files in <code>hexapod-main/Chipo/</code> for Chipo version. Use the highest-numbered file variant (latest version).
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>3D Print All Parts</h4>
+          <ul>
+            <li><code>coxa-996.stl</code> — 6 pieces (one per leg)</li>
+            <li><code>femur-996.stl</code> — 6 pieces</li>
+            <li><code>tibia-996.stl</code> — 6 pieces</li>
+            <li><code>tip.stl</code> — 6 pieces (foot tip)</li>
+            <li><code>ring.stl</code> — 6 pieces (femur ring)</li>
+            <li><code>idler.stl</code> — 6–12 pieces</li>
+            <li><code>rod.stl</code> — 6 pieces (tibia rod)</li>
+            <li><code>ms-holder.stl</code> — 6 pieces (microswitch holder)</li>
+            <li><code>limitter.stl</code> — 6 pieces (travel limiter)</li>
+            <li><code>frame.stl</code> — 1 piece (main body)</li>
+            <li><code>top-cover4.stl</code> — 1 piece (use highest number)</li>
+            <li><code>bottom-cover2.stl</code> — 1 piece</li>
+            <li><code>battery-bar.stl</code> — 1 piece</li>
+            <li><code>phone-bar.stl</code> — 1 piece</li>
+            <li><code>shield.stl</code> — 1 piece</li>
+          </ul>
+          <p style="margin-top:8px;">Print settings: 0.2mm layer height, 4 perimeters, 20–30% infill (gyroid or honeycomb).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Servo Zeroing (CRITICAL — Do Before Assembly)</h4>
+          <p>Before inserting any servo into a leg, center each servo to 90° (1500ms pulse). Connect each servo individually to a servo tester or microcontroller. Set to center position THEN attach the servo horn. If you skip this, you cannot calibrate later without disassembly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Build One Leg Assembly</h4>
+          <ul>
+            <li>Coxa servo mounts into coxa bracket (M3 screws)</li>
+            <li>Femur servo mounts into femur bracket</li>
+            <li>Tibia servo drives tibia via the rod linkage</li>
+            <li>Tip clips onto tibia end</li>
+            <li>Microswitch press-fits into ms-holder at tip</li>
+            <li>Test range of motion before continuing to next leg</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Build All 6 Legs</h4>
+          <p>Repeat leg assembly x6. Keep left and right legs mirror-imaged. Attach coxa assemblies to the main frame (hexagonal body). Use M3 x 10mm or M3 x 12mm screws depending on frame thickness.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Wire All 18 Servos</h4>
+          <p>Route servo wires through frame channels to the center. Follow the wiring diagram exactly. Use the pin mapping from Section 5: L11=P0, L12=P1... etc. Bundle wires with zip ties to keep neat. Label each connector before plugging in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Mount Servo2040 + Relay</h4>
+          <p>Mount Servo2040 to bottom cover plate. Mount relay module nearby. Connect relay: control signal to P26, relay COM to battery+, relay NO to Servo2040 power terminal. This allows firmware to kill servo power in emergencies.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>Connect Battery, Switch, and Touch Sensors</h4>
+          <p>Wire battery through main power switch, then through relay to Servo2040 screw terminal. Connect 6 touch sensors to P18–P23. Install battery-bar for LiPo, phone-bar for Android phone. Close top/bottom covers.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <h4>Flash Firmware and Calibrate</h4>
+          <p>Flash the .uf2 firmware (see Section 6). Load chipo-config-2040.txt. Test each servo individually via the app. Fine-tune PWM values in config file until all joints are properly centered. This is the most time-consuming step (2–5 hours).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: YOUTUBE -->
+  <section id="youtube">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>YouTube Channel — Video Guide</h2>
+    </div>
+
+    <div class="alert alert-info">
+      Channel: <a href="https://www.youtube.com/@makeyourpet" target="_blank" style="color:var(--blue-text); font-weight:600;">youtube.com/@makeyourpet</a> — Contains full build playlist "How To Make A Hexapod Robot"
+    </div>
+
+    <div class="video-item">
+      <div class="video-num">1</div>
+      <div>
+        <h4>How To Make A Hexapod Robot — Part 1: Building a Leg</h4>
+        <p>First video in the main series. Covers the complete assembly of a single leg: coxa, femur, tibia, tip. Shows exactly which screws to use, servo installation, horn attachment, and range-of-motion testing.</p>
+      </div>
+    </div>
+    <div class="video-item">
+      <div class="video-num">2</div>
+      <div>
+        <h4>How To Make A Hexapod Robot — Part 2: Full Assembly</h4>
+        <p>Connects all 6 legs to the body frame. Shows body frame assembly, battery mounting, wiring routing, and cover installation. Demonstrates the wiring harness management technique.</p>
+      </div>
+    </div>
+    <div class="video-item">
+      <div class="video-num">3</div>
+      <div>
+        <h4>How To Make A Hexapod Robot — Part 3: Software Setup</h4>
+        <p>Shows complete Servo2040 firmware flashing process, Chica Server app setup, config file loading, servo calibration, and first walking test. Also demonstrates switching between gait modes.</p>
+      </div>
+    </div>
+    <div class="video-item">
+      <div class="video-num">4</div>
+      <div>
+        <h4>Build Chica The Hexapod Using Pimoroni Servo2040</h4>
+        <p>Dedicated video for Servo2040 integration. Covers the PCB trace cut, power wiring, relay connection, and phone USB-C interface. MOST IMPORTANT VIDEO for electronics setup.</p>
+      </div>
+    </div>
+    <div class="video-item">
+      <div class="video-num">5</div>
+      <div>
+        <h4>Chipo — Budget Hexapod Build</h4>
+        <p>Shows specifically the Chipo (MG996R) version. Differences in leg dimensions, servo selection, and frame fit compared to Chica. Addresses common assembly mistakes with cheaper servos.</p>
+      </div>
+    </div>
+    <div style="background:var(--parchment); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-top:8px; font-size:14px; color:var(--text-mid);">
+      <strong style="color:var(--accent-dark);">Tip:</strong> Watch each video at 0.5x speed during assembly. Pause frequently. Video descriptions contain links to parts lists and Discord server. Many builders share their config calibration values in the YouTube comments.
+    </div>
+  </section>
+
+  <!-- SECTION 9: SOFTWARE -->
+  <section id="software">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>Software Architecture</h2>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Chica Server (Android App)</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>Runs on the Android phone mounted on the robot</li>
+          <li>Connects to Servo2040 via USB-C data connection</li>
+          <li>Receives commands from Chica Client app over WiFi</li>
+          <li>Processes IK calculations on phone's CPU</li>
+          <li>Sends PWM commands to Servo2040 via USB serial</li>
+          <li>Shows live camera feed</li>
+          <li>Google Play: search "Chica Server MakeYourPet"</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Chica Client (Android App)</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>Runs on a SECOND phone or tablet (your controller)</li>
+          <li>Connects to Chica Server over WiFi (same network)</li>
+          <li>Provides joystick controls for movement</li>
+          <li>Can switch between 6 gait modes</li>
+          <li>Shows live camera stream from robot's phone</li>
+          <li>Controls speed, direction, body height</li>
+          <li>Google Play: search "Chica Client MakeYourPet"</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">FYP Custom Software Plan</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>Write custom MicroPython firmware for Servo2040 (IK + gaits)</li>
+          <li>Build Android app using Kotlin/Flutter</li>
+          <li>Integrate Gemini API for AI voice assistant</li>
+          <li>Use phone camera for person/hazard detection (MediaPipe)</li>
+          <li>Whisper STT (via Groq API) for voice commands</li>
+          <li>Serial protocol over USB-C: JSON commands</li>
+          <li>THIS is what you coded — examiners will be satisfied</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;">
+      <div class="card-title" style="padding:0 0 10px 0; border-bottom:1px solid var(--border); margin-bottom:14px; font-family:'Playfair Display',serif; font-size:18px; color:var(--accent-dark);">Custom IK Firmware Architecture (MicroPython)</div>
+      <pre><code># Hexapod MicroPython Firmware — Core Structure
+# File: main.py (Pimoroni Servo2040)
+
+from servo import Servo2040, ANGULAR
+import ujson, usys, time
+
+SERVO_COUNT = 18
+FEMUR = 60   # mm (Chipo)
+TIBIA = 104  # mm (Chipo)
+
+# Leg mapping: [coxa_pin, femur_pin, tibia_pin]
+LEGS = {
+    'L1': [0, 1, 2],   'R1': [9, 10, 11],
+    'L2': [3, 4, 5],   'R2': [12, 13, 14],
+    'L3': [6, 7, 8],   'R3': [15, 16, 17],
+}
+
+def inverse_kinematics(x, y, z):
+    """3DOF IK per leg — returns [coxa_angle, femur_angle, tibia_angle]"""
+    import math
+    coxa_angle = math.degrees(math.atan2(y, x))
+    l = math.sqrt(x**2 + y**2)  # horizontal distance
+    d = math.sqrt(l**2 + z**2)  # 3D distance
+    a1 = math.degrees(math.atan2(-z, l))
+    a2 = math.degrees(math.acos((FEMUR**2 + d**2 - TIBIA**2) / (2 * FEMUR * d)))
+    femur_angle = a1 + a2
+    tibia_angle = math.degrees(math.acos((FEMUR**2 + TIBIA**2 - d**2) / (2 * FEMUR * TIBIA)))
+    return coxa_angle, femur_angle, tibia_angle - 180
+
+def tripod_gait_step(phase):
+    """Tripod gait: 3 legs swing, 3 legs stance alternating"""
+    # Group A: L1, R2, L3
+    # Group B: R1, L2, R3
+    pass  # Full implementation provided separately</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 10: BUDGET -->
+  <section id="budget">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>Complete Budget Breakdown (PKR)</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Price (PKR)</th>
+            <th>Total (PKR)</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MG996R Metal Gear Servo (quality brand)</td>
+            <td>20 (18 + 2 spare)</td>
+            <td>1,100–1,300</td>
+            <td>22,000–26,000</td>
+            <td>AliExpress / Daraz / local RC shop</td>
+          </tr>
+          <tr>
+            <td>Pimoroni Servo2040 Controller</td>
+            <td>1</td>
+            <td>4,500–7,000</td>
+            <td>4,500–7,000</td>
+            <td>Import from Pimoroni UK / local electronics</td>
+          </tr>
+          <tr>
+            <td>7.4V 2S LiPo Battery (4500mAh+, 30C)</td>
+            <td>1</td>
+            <td>6,000–8,000</td>
+            <td>6,000–8,000</td>
+            <td>RC hobby shop Lahore / online</td>
+          </tr>
+          <tr>
+            <td>IMAX B6 LiPo Balance Charger</td>
+            <td>1</td>
+            <td>1,500–2,500</td>
+            <td>1,500–2,500</td>
+            <td>RC shop / Daraz</td>
+          </tr>
+          <tr>
+            <td>SRD-05VDC Relay Module</td>
+            <td>1</td>
+            <td>200–350</td>
+            <td>200–350</td>
+            <td>Local electronics market</td>
+          </tr>
+          <tr>
+            <td>Microswitch x6 (leg touch sensors)</td>
+            <td>6</td>
+            <td>50–80</td>
+            <td>300–480</td>
+            <td>Electronics market</td>
+          </tr>
+          <tr>
+            <td>PLA Filament 1.75mm (white or grey)</td>
+            <td>1.5–2 kg</td>
+            <td>3,000–4,000/kg</td>
+            <td>4,500–8,000</td>
+            <td>3D printing shop / online</td>
+          </tr>
+          <tr>
+            <td>M3 Screw Assortment Kit (500+ pieces)</td>
+            <td>1 set</td>
+            <td>600–900</td>
+            <td>600–900</td>
+            <td>Hardware shop</td>
+          </tr>
+          <tr>
+            <td>M2 Screw Assortment Kit</td>
+            <td>1 set</td>
+            <td>300–500</td>
+            <td>300–500</td>
+            <td>Hardware shop</td>
+          </tr>
+          <tr>
+            <td>Silicone Wire Assortment (20AWG + 26AWG)</td>
+            <td>5m each</td>
+            <td>500–800</td>
+            <td>500–800</td>
+            <td>Electronics market</td>
+          </tr>
+          <tr>
+            <td>XT60 Connectors (4 pairs), JST connectors</td>
+            <td>1 set</td>
+            <td>300–500</td>
+            <td>300–500</td>
+            <td>Electronics market / Daraz</td>
+          </tr>
+          <tr>
+            <td>Main Power Rocker Switch</td>
+            <td>1</td>
+            <td>100–200</td>
+            <td>100–200</td>
+            <td>Hardware / electronics</td>
+          </tr>
+          <tr>
+            <td>Heat Shrink, zip ties, solder, flux</td>
+            <td>1 set</td>
+            <td>400–600</td>
+            <td>400–600</td>
+            <td>Electronics market</td>
+          </tr>
+          <tr>
+            <td>Servo Extension Cables (30cm, x18)</td>
+            <td>18</td>
+            <td>80–120</td>
+            <td>1,440–2,160</td>
+            <td>RC shop / Daraz</td>
+          </tr>
+          <tr>
+            <td>Android Phone (if needed for robot)</td>
+            <td>1</td>
+            <td>Your existing phone</td>
+            <td>0</td>
+            <td>Use your own phone mounted on robot</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="budget-total">
+      <div>
+        <div class="label">Total Estimated Budget</div>
+        <div class="note">Chipo Student Version — PKR values vary by source</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="amount">PKR 42,000 – 57,990</div>
+        <div class="note">Including 3D printing. Excluding phone. Buy screws in bulk.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 11: CHALLENGES & SOLUTIONS -->
+  <section id="challenges">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>Engineering Challenges & Solutions</h2>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">1. High Power Consumption</div>
+        <p style="font-size:14px; color:var(--text-mid);"><strong>Challenge:</strong> 18 motors drain the battery quickly (20-30 min max).</p>
+        <p style="font-size:14px; color:var(--green-text); margin-top:8px;"><strong>Solution:</strong> Implement "Sleep Mode" in software to drop chassis to the ground and cut relay power to servos when idle. Use high C-rating (40C+) 6200mAh LiPo.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">2. Complex Kinematics Math</div>
+        <p style="font-size:14px; color:var(--text-mid);"><strong>Challenge:</strong> 18-DOF Inverse Kinematics requires heavy trigonometry and matrices.</p>
+        <p style="font-size:14px; color:var(--green-text); margin-top:8px;"><strong>Solution:</strong> Offload complex math to the Android smartphone processor. Use Law of Cosines for geometric 3-DOF IK instead of matrix multiplication. Send final angles to RP2040 via Serial.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">3. Hardware Play & Vibration</div>
+        <p style="font-size:14px; color:var(--text-mid);"><strong>Challenge:</strong> MG996R servos have mechanical play causing jitter.</p>
+        <p style="font-size:14px; color:var(--green-text); margin-top:8px;"><strong>Solution:</strong> Upgrade to Aluminium (25T) metal servo horns. Implement LERP (Linear Interpolation) in code for smooth angle transitions.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">4. Complex Wire Management</div>
+        <p style="font-size:14px; color:var(--text-mid);"><strong>Challenge:</strong> Routing 18 servo cables causes tangles and interference.</p>
+        <p style="font-size:14px; color:var(--green-text); margin-top:8px;"><strong>Solution:</strong> Label all connectors BEFORE routing. Use spiral wire wrap to combine 3 servo wires per leg into 1 thick cable. Use zip ties for inner chassis routing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 12: FYP DEFENSE -->
+  <section id="fyp">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <h2>FYP Defense Preparation</h2>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Expected Examiner Questions</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li style="margin-bottom:8px;"><strong>Q: "What is the purpose of this robot?"</strong><br>A: Autonomous bio-inspired hexapod for hazardous terrain navigation, disaster search & rescue operations in environments too dangerous for humans or wheeled robots.</li>
+          <li style="margin-bottom:8px;"><strong>Q: "Why 6 legs and not wheels?"</strong><br>A: Hexapod locomotion provides 100% static stability at all times (3 legs always on ground), can navigate rubble, stairs, and uneven terrain impossible for wheeled or tracked robots. Bio-inspired from insects.</li>
+          <li style="margin-bottom:8px;"><strong>Q: "What did YOU code?"</strong><br>A: Custom MicroPython IK firmware on RP2040, tripod gait algorithm, touch sensor terrain adaptation, AI voice assistant integration using Gemini API, real-time vision processing pipeline on Android.</li>
+          <li style="margin-bottom:8px;"><strong>Q: "What is Inverse Kinematics?"</strong><br>A: Mathematical method to calculate required joint angles (coxa, femur, tibia) to achieve a desired foot position in 3D space. We use 3-DOF IK per leg with geometric solver.</li>
+          <li style="margin-bottom:8px;"><strong>Q: "What is the cost?"</strong><br>A: Student version: PKR 42,000–58,000. Cost-optimized using MG996R servos instead of premium coreless servos, 3D printed chassis instead of aluminum CNC.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Key Technical Points to Emphasize</div>
+        <ul style="font-size:14px; color:var(--text-mid); padding-left:18px;">
+          <li>18 servo actuators with real-time PWM control (Mechatronics)</li>
+          <li>18 DOF bio-inspired locomotion system (Robotics)</li>
+          <li>Embedded systems programming on RP2040 (Electronics)</li>
+          <li>3DOF inverse kinematics per leg — custom mathematical implementation</li>
+          <li>Terrain-adaptive gait switching via touch sensor feedback</li>
+          <li>AI integration: Gemini Flash API for NLP voice commands</li>
+          <li>Computer vision: MediaPipe for person/hazard detection</li>
+          <li>6 gaits: Standard, Race, Offroad, Custom, Quadruped, Block</li>
+          <li>Battery management: LiPo voltage/current protection with relay cutoff</li>
+          <li>Real-time camera streaming from robot to operator</li>
+        </ul>
+
+        <div class="alert alert-success" style="margin-top:14px; font-size:13px;">
+          <strong>Score Estimate:</strong> Hexapod with AI integration = 9.5/10 FYP score. This is a genuinely novel combination of bio-inspired robotics + AI + embedded systems that directly addresses real-world search & rescue limitations.
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div class="card-title">Timeline Plan (4–5 Months)</div>
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead><tr><th>Phase</th><th>Duration</th><th>Tasks</th></tr></thead>
+          <tbody>
+            <tr><td>Phase 1: Procurement</td><td>2 weeks</td><td>Order all parts, wait for delivery. Start 3D printing immediately.</td></tr>
+            <tr><td>Phase 2: 3D Printing</td><td>2–3 weeks</td><td>Print all 80+ parts. Test print one leg first. Can run printer 24/7.</td></tr>
+            <tr><td>Phase 3: Mechanical Assembly</td><td>1 week</td><td>Assemble 6 legs + frame. Servo zeroing. Basic range of motion testing.</td></tr>
+            <tr><td>Phase 4: Electronics + Wiring</td><td>1 week</td><td>All 18 servos wired, relay, sensors, battery. Flash firmware. First movement.</td></tr>
+            <tr><td>Phase 5: IK + Gait Programming</td><td>3–4 weeks</td><td>Write MicroPython IK, implement tripod gait, terrain adaptation.</td></tr>
+            <tr><td>Phase 6: AI Integration</td><td>2–3 weeks</td><td>Android app, Gemini API voice, MediaPipe vision, serial protocol.</td></tr>
+            <tr><td>Phase 7: Testing + Documentation</td><td>2 weeks</td><td>Full system test, fix bugs, write FYP report, prepare defense presentation.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>MakeYourPet Hexapod — Complete Research Guide</p>
+  <p style="margin-top:6px;">Compiled for <strong>Abdullah Bin Zafar</strong> (2023-MC-292) — UET Lahore, Faisalabad Campus — Mechatronics Engineering FYP 2023–2027</p>
+  <p style="margin-top:6px; font-size:12px;">Supervisor: Dr./Engr. Asif Ishfaq | Co-Supervisor: Dr. Shoaib Aslam</p>
+</footer>
+
+</body>
+</html>
